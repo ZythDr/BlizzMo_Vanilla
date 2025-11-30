@@ -1,4 +1,4 @@
-﻿---------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- Name: BlizzMo
 -- Version: 0.1
 -- Author: Dyaxler
@@ -139,74 +139,7 @@ local function OnShow()
     else
         this:SetScale(1)
     end
-    -- Hook Frames
-    if this == CharacterFrame then
-        ShowUIPanel(CharacterFrame_OnShow())
-    elseif this == SpellBookFrame then
-        ShowUIPanel(SpellBookFrame_OnShow())
-    elseif this == TalentFrame then
-        ShowUIPanel(TalentFrame_OnShow())
-    elseif this == QuestLogFrame then
-        ShowUIPanel(QuestLog_OnShow())
-    elseif this == FriendsFrame then
-        ShowUIPanel(FriendsFrame_OnShow())
-    elseif this == KeyBindingFrame then
-        KeyBindingFrame_OnShow()
-    elseif this == MacroFrame then
-        MacroFrame_OnShow()
-    elseif this == SuperMacroFrame then
-        SuperMacroFrame_OnShow()
-    elseif this == HelpFrame then
-        HelpFrame_OnShow()
-    elseif this == MailFrame then
-        ShowUIPanel(MailFrame)
-    elseif this == ClassTrainerFrame then
-        PlaySound("igCharacterInfoOpen")
-        SetTrainerServiceTypeFilter("available", TRAINER_FILTER_AVAILABLE)
-        SetTrainerServiceTypeFilter("unavailable", TRAINER_FILTER_UNAVAILABLE)
-        SetTrainerServiceTypeFilter("used", TRAINER_FILTER_USED)
-    elseif this == DressUpFrame then
-        SetPortraitTexture(DressUpFramePortrait, "player")
-        PlaySound("igCharacterInfoOpen")
-    elseif this == GossipFrame then
-        PlaySound("igQuestListOpen")
-        if (StaticPopup_Visible("XP_LOSS")) then
-            StaticPopup_Hide("XP_LOSS")
-        end
-    elseif this == InspectFrame then
-        InspectFrame_OnShow()
-    elseif this == AuctionFrame then
-        AuctionFrame_OnShow()
-    elseif this == MerchantFrame then
-        MerchantFrame_OnShow()
-        PlaySound("igCharacterInfoOpen")
-    elseif this == TradeSkillFrame then
-        TradeSkillInputBox:SetNumber(1)
-        PlaySound("igCharacterInfoOpen")
-    elseif this == FriendsFrame then
-        ShowUIPanel(FriendsFrame_OnShow())
-    elseif this == CraftFrame then
-        CraftFrame_Show()
-        PlaySound("igCharacterInfoOpen")
-    elseif this == QuestFrame then
-        QuestFrame_OnShow()
-    elseif this == LootFrame then
-        LootFrame_OnShow()
-    elseif this == PetFrame then
-        UnitFrame_Update()
-        PetFrame_Update()
-    elseif this == PetStableFrame then
-        ShowUIPanel(PetStableFrame_OnShow())
-    elseif this == TaxiFrame then
-        PlaySound("igMainMenuOpen")
-        DrawOneHopLines()
-    elseif this == TradeFrame then
-        TradeFrame_OnShow()
-        PlaySound("igCharacterInfoOpen")
-    elseif this == BankFrame then
-        PlaySound("igMainMenuOpen")
-    end
-    UpdateMicroButtons()
+    
     -- Player Bags
     local parentNum = strsub(this:GetName(), 15)
     if (tonumber(parentNum) ~= nil) and (tonumber(parentNum) < 6) then
@@ -366,7 +299,16 @@ local function SetMoveHandler(frameToMove, handler)
     handler:SetScript("OnDragStop", OnDragStop)
 
     -- Override frame position according to settings when shown
-   	frameToMove:SetScript("OnShow", OnShow)
+    if not frameToMove.blizzMoHooked then
+        local originalOnShow = frameToMove:GetScript("OnShow")
+        frameToMove:SetScript("OnShow", function()
+            if originalOnShow then
+                originalOnShow()
+            end
+            OnShow()
+        end)
+        frameToMove.blizzMoHooked = true
+    end
 
     -- Hook OnMouseUp
 	handler:SetScript("OnMouseUp", OnMouseUp)
